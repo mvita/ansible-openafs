@@ -1,0 +1,21 @@
+[submodule "roles/openafs_cell"]
+	path = roles/openafs_cell
+	url = https://github.com/openafs-contrib/ansible-role-openafs-cell
+[submodule "roles/openafs_client"]
+	path = roles/openafs_client
+	url = https://github.com/openafs-contrib/ansible-role-openafs-client
+[submodule "roles/openafs_devel"]
+	path = roles/openafs_devel
+	url = https://github.com/openafs-contrib/ansible-role-openafs-devel
+[submodule "roles/openafs_krbclient"]
+	path = roles/openafs_krbclient
+	url = https://github.com/openafs-contrib/ansible-role-openafs-krbclient
+[submodule "roles/openafs_krbserver"]
+	path = roles/openafs_krbserver
+	url = https://github.com/openafs-contrib/ansible-role-openafs-krbserver
+[submodule "roles/openafs_robotest"]
+	path = roles/openafs_robotest
+	url = https://github.com/openafs-contrib/ansible-role-openafs-robotest
+[submodule "roles/openafs_server"]
+	path = roles/openafs_server
+	url = https://github.com/openafs-contrib/ansible-role-openafs-server
