@@ -1,6 +1,0 @@
----
-- name: Gather variables for each operating system
-  include_vars: "{{ ansible_os_family|lower }}.yaml"
-
-- name: Install development tools and libraries
-  include_tasks: "install-{{ ansible_pkg_mgr }}.yaml"
