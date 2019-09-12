@@ -4,7 +4,13 @@
 help:
 	@echo "usage: make <target>"
 	@echo "targets:"
-	@echo "  lint   lint check"
+	@echo "  update        update git submodules"
+	@echo "  lint          lint check"
+
+.PHONY: update
+update:
+	git submodule init
+	git submodule update
 
 .PHONY: lint
 lint:
