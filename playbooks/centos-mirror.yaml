@@ -1,0 +1,35 @@
+---
+#
+# Playbook to create and update a local CentOS mirror.
+#
+- name: Create CentOS mirror
+  hosts: afs_centos_mirrors
+  become: "yes"
+  tasks:
+    - name: Install Apache
+      yum:
+        name: httpd
+        state: present
+    - name: Install yum repo tools
+      yum:
+        name:
+          - createrepo
+          - yum-utils
+    - name: Create directories to store repositories
+      file:
+        path: "/var/www/html/repos/{{ item }}"
+        state: directory
+      with_items:
+        - base
+        - centosplus
+        - extras
+        - updates
+    - name: Synchronize repositories
+      command: "reposync -g -l -d -m --repoid={{ item }} --newest-only --download-metadata --download_path=/var/www/html/repos/"
+      with_items:
+        - base
+        - centosplus
+        - extras
+        - updates
+    - name: Create repository
+      command: createrepo /var/www/html
