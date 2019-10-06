@@ -1,0 +1,8 @@
+---
+- name: test openafs_build role
+  hosts: localhost
+  become: "yes"
+  tasks:
+    - include_role:
+        name: openafs_devel
+        tasks_from: download-source-tarball.yaml

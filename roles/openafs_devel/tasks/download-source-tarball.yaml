@@ -1,3 +1,16 @@
 ---
-- fail:
-    msg: todo
+- name: Create directory for OpenAFS source files
+  become: "no"
+  file:
+    path: "/home/{{ ansible_user }}/src/openafs-1.8.3"
+    state: directory
+
+- name: Download OpenAFS source files
+  become: "no"
+  unarchive:
+    src: http://openafs.org/dl/openafs/1.8.3/openafs-1.8.3-src.tar.gz
+    dest: "/home/{{ ansible_user }}/src/openafs-1.8.3"
+    remote_src: yes
+  with_items:
+    - "http://openafs.org/dl/openafs/1.8.3/openafs-1.8.3-src.tar.gz"
+    - "http://openafs.org/dl/openafs/1.8.3/openafs-1.8.3-doc.tar.gz"
