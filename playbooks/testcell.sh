@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
-set -x
-: Running postcreate script for ${VIRTLAB_NAME}
+#set -x
+
+echo "Running playbooks for ${VIRTLAB_NAME}"
 ansible-playbook -i ${VIRTLAB_SCRIPTDIR}/inventory.sh ${VIRTLAB_LOCAL_PLAYBOOKS} ${VIRTLAB_PLAYBOOK}
-ssh ${VIRTLAB_TESTHOST} run-openafs-robotest.sh ${VIRTLAB_TESTSUITE}
+
+if [ ! -z "${VIRTLAB_TESTSUITE}"]; then
+    echo "Running test suite ${VIRTLAB_TESTSUITE}"
+    ssh ${VIRTLAB_TESTHOST} run-openafs-robotest.sh ${VIRTLAB_TESTSUITE}
+fi

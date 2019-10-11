@@ -1,0 +1,11 @@
+---
+- name: Install from source
+  include_role:
+    name: openafs_devel
+    tasks_from: make-install
+  vars:
+    afs_devel_build_server: yes
+    afs_devel_build_client: no
+    afs_devel_fetch_method: "{{ afs_server_build_fetch_method }}"
+    afs_devel_git_repo: "{{ afs_server_build_git_repo }}"
+    afs_devel_git_ref: "{{ afs_server_build_git_ref }}"
