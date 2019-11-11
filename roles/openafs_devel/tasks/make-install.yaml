@@ -1,3 +1,98 @@
 ---
-- fail:
-    msg: todo
+- name: Gather variables for each operating system
+  include_vars: "{{ ansible_os_family|lower }}.yaml"
+
+- name: Install development tools and libraries
+  include_tasks: "install-{{ ansible_pkg_mgr }}.yaml"
+
+- name: Create user
+  user:
+    name: "{{ afs_devel_user }}"
+    state: present
+
+- name: Git checkout
+  become: "yes"
+  become_user: "{{ afs_devel_user }}"
+  git:
+    repo: "{{ afs_devel_git_repo }}"
+    dest: "{{ afs_devel_topdir }}"
+    version: "{{ afs_devel_git_ref }}"
+  when: False
+
+- name: Generate configure
+  become: "yes"
+  become_user: "{{ afs_devel_user }}"
+  command: ./regen.sh
+  args:
+    chdir: "{{ afs_devel_topdir }}"
+    creates: configure
+
+- name: Configure
+  become: "yes"
+  become_user: "{{ afs_devel_user }}"
+  command: >
+    ./configure
+    --enable-debug --enable-debug-kernel
+    --disable-optimize --disable-optimize-kernel
+    --with-afs-sysname={{ afs_devel_sysname | default('amd64_linux26') }}
+    --{{ afs_devel_build_client | ternary('enable', 'disable') }}-kernel-module
+    {{ afs_devel_configure_opts | default('') }}
+  environment: "{{ afs_devel_configure.env | default({}) }}"
+  args:
+    chdir: "{{ afs_devel_topdir }}"
+    creates: config.status
+
+- name: Make
+  become: "yes"
+  become_user: "{{ afs_devel_user }}"
+  make:
+    chdir: "{{ afs_devel_topdir }}"
+    target: "{{ afs_devel_build_client | ternary('all', 'all_nolibafs') }}"
+
+- name: Make install
+  make:
+    chdir: "{{ afs_devel_topdir }}"
+    target: "{{ afs_devel_build_client | ternary('install', 'install_nolibafs') }}"
+
+- name: Install asetkey to a standard location
+  copy:
+    remote_src: true
+    src: "{{ afs_devel_topdir }}/src/aklog/asetkey"
+    dest: "{{ afs_asetkey }}"
+    owner: root
+    group: root
+    mode: 0755
+  when: afs_devel_build_server
+
+- name: Check for akeyconvert
+  stat:
+    path: "{{ afs_devel_topdir }}/src/aklog/akeyconvert"
+  register: akeyconvert_st
+
+- name: Install akeyconvert to a standard location
+  copy:
+    remote_src: true
+    src: "{{ afs_devel_topdir }}/src/aklog/akeyconvert"
+    dest: "{{ afs_akeyconvert }}"
+    owner: root
+    group: root
+    mode: 0755
+  when: afs_devel_build_server and akeyconvert_st.stat.exists
+
+- name: Install module probe script
+  copy:
+    src: "{{ ansible_os_family|lower }}/openafs-client.modules"
+    dest: "/etc/sysconfig/openafs"
+  when: afs_devel_build_client
+
+- name: Install server systemd unit file
+  copy:
+    src: "{{ ansible_os_family|lower }}/openafs-server.service"
+    dest: "/usr/lib/systemd/system/openafs-server.service"
+  when: afs_devel_build_server
+
+- name: Install client systemd unit file
+  copy:
+    src: "{{ role_path }}/files/{{ ansible_os_family|lower }}/openafs-client.service"
+    dest: "/usr/lib/systemd/system/openafs-client.service"
+  when: afs_devel_build_client

@@ -9,3 +9,6 @@
     afs_devel_fetch_method: "{{ afs_server_build_fetch_method }}"
     afs_devel_git_repo: "{{ afs_server_build_git_repo }}"
     afs_devel_git_ref: "{{ afs_server_build_git_ref }}"
+
+- name: Platform specific post make-install tasks
+  include_tasks: "post-make-install-{{ ansible_os_family | lower }}.yaml"
